@@ -1,0 +1,30 @@
+00000400 Starting Address
+Assembler used: EASy68K Editor/Assembler v5.15.04
+Created On: 08/11/2018 11:57:28
+
+00000000                             1  AFFCAR:
+Line 2 ERROR: Undefined symbol
+00000000  33FC 0006 00544480         2      MOVE #6,DO
+00000008  4E4F                       3      TRAP #15
+0000000A  4E75                       4      RTS
+0000000C                             5  SAISCAR:
+Line 6 ERROR: Undefined symbol
+0000000C  33FC 0005 00544480         6      MOVE #5,DO
+00000014  4E4F                       7      TRAP #15
+00000016  4E75                       8      RTS
+00000018  303C 0009                  9  FINPRG: MOVE #9,D0
+0000001C  4E4F                      10          TRAP #15
+0000001E                            11  
+0000001E                            12  
+Line 13 WARNING: END directive missing, starting address not set
+
+2 errors detected
+1 warning generated
+
+
+SYMBOL TABLE INFORMATION
+Symbol-name         Value
+-------------------------
+AFFCAR              0
+FINPRG              18
+SAISCAR             C

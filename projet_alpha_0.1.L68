@@ -1,0 +1,329 @@
+00000400 Starting Address
+Assembler used: EASy68K Editor/Assembler v5.15.04
+Created On: 05/12/2018 10:09:56
+
+00000000                             1  *-----------------------------------------------------------
+00000000                             2  * Title      :
+00000000                             3  * Written by :
+00000000                             4  * Date       :
+00000000                             5  * Description:
+00000000                             6  *-----------------------------------------------------------
+00000400                             7      ORG $400
+00000400                             8      
+00000400                             9      * Création de la fenêtre : 1280*720 
+00000400  223C 050002D0             10      move.l #$050002D0,D1
+00000406  4EB9 00000642             11      jsr resolution
+0000040C                            12      
+0000040C                            13      * Remplissage de l'arrière plan en blanc 
+0000040C  2239 0000080C             14      move.l BLANC,D1
+00000412  4EB9 00000662             15      jsr set_fill_color
+00000418  323C 0000                 16      move #$0000,D1
+0000041C  343C 0000                 17      move #$0000,D2
+00000420  363C 0500                 18      move #$0500,D3
+00000424  383C 02D0                 19      move #$02D0,D4
+00000428  4EB9 00000692             20      jsr draw_fill_rect
+0000042E                            21      
+0000042E                            22      * Barre de tâches
+0000042E  2239 00000804             23      move.l GRIS_F,D1
+00000434  4EB9 0000065A             24      jsr set_pen_color
+0000043A  2239 00000800             25      move.l GRIS_C,D1
+00000440  4EB9 00000662             26      jsr set_fill_color
+00000446  323C 0000                 27      move #$0000,D1 * X
+0000044A  343C 0000                 28      move #$0000,D2 * Y
+0000044E  363C 0500                 29      move #$0500,D3 * X1
+00000452  383C 0040                 30      move #$0040,D4 * Y1
+00000456  4EB9 00000692             31      jsr draw_fill_rect
+0000045C                            32      
+0000045C                            33      * CASES DANS LA BARRE DES TACHES
+0000045C                            34      
+0000045C                            35      * PREMIERE CASE
+0000045C  323C 0000                 36      move #$0000,D1
+00000460  343C 0000                 37      move #$0000,D2
+00000464  363C 0040                 38      move #$0040,D3
+00000468  383C 0040                 39      move #$0040,D4
+0000046C  4EB9 00000692             40      jsr draw_fill_rect 
+00000472                            41      * MOINS DESSINE
+00000472  2239 00000804             42      move.l GRIS_F,D1
+00000478  4EB9 00000662             43      jsr set_fill_color
+0000047E  323C 000A                 44      move #$000A,D1
+00000482  343C 001B                 45      move #$001B,D2
+00000486  363C 0036                 46      move #$0036,D3
+0000048A  383C 0023                 47      move #$0023,D4
+0000048E  4EB9 00000692             48      jsr draw_fill_rect
+00000494                            49  
+00000494                            50      * DEUXIEME CASE
+00000494  2239 00000804             51      move.l GRIS_F,D1
+0000049A  4EB9 0000065A             52      jsr set_pen_color
+000004A0  2239 00000800             53      move.l GRIS_C,D1
+000004A6  4EB9 00000662             54      jsr set_fill_color 
+000004AC  323C 0040                 55      move #$0040,D1
+000004B0  343C 0000                 56      move #$0000,D2
+000004B4  363C 0080                 57      move #$0080,D3
+000004B8  383C 0040                 58      move #$0040,D4
+000004BC  4EB9 00000692             59      jsr draw_fill_rect 
+000004C2                            60      * PLUS DESSINE
+000004C2  2239 00000804             61      move.l GRIS_F,D1
+000004C8  4EB9 00000662             62      jsr set_fill_color
+000004CE  323C 005B                 63      move #$005B,D1
+000004D2  343C 000A                 64      move #$000A,D2
+000004D6  363C 0065                 65      move #$0065,D3
+000004DA  383C 0036                 66      move #$0036,D4
+000004DE  4EB9 00000692             67      jsr draw_fill_rect
+000004E4  323C 004A                 68      move #$004A,D1
+000004E8  343C 001B                 69      move #$001B,D2
+000004EC  363C 0076                 70      move #$0076,D3
+000004F0  383C 0025                 71      move #$0025,D4
+000004F4  4EB9 00000692             72      jsr draw_fill_rect
+000004FA                            73      
+000004FA                            74      
+000004FA                            75      * Utilisation de la souris 
+000004FA                            76  SOURIS_LOOP:
+000004FA  4EB9 0000064A             77      jsr get_mouse
+00000500  33C1 00000814             78      move.w D1,X  * récupérer coordonnée X de la souris 
+00000506  E089                      79      lsr.l #$8,D1 * décalage de 16 bits pour récupérer Y 
+00000508  E089                      80      lsr.l #$8,D1
+0000050A  33C1 00000816             81      move.w D1,Y
+00000510  B279 0000081A             82      cmp TAILLE_TB,D1
+00000516  6D00 0014                 83      blt TASKBAR
+0000051A                            84      * clic gauche appuyé 
+0000051A  B03C 0001                 85      cmp.b #1,D0 
+0000051E  6700 0072                 86      beq PIXEL_DESSIN
+00000522                            87      * clic droit appuyé 
+00000522  B03C 0002                 88      cmp.b #2,D0
+00000526  6700 00B0                 89      beq PIXEL_EFFACE
+0000052A  60CE                      90      bra SOURIS_LOOP
+0000052C                            91  
+0000052C                            92      * souris dans la barre de tache
+0000052C                            93  TASKBAR:
+0000052C  0C79 0040 00000814        94      cmp.w #$0040,X
+00000534  6D00 0010                 95      blt TASKBAR_ICO_1
+00000538  0C79 0080 00000814        96      cmp.w #$0080,X
+00000540  6D00 0028                 97      blt TASKBAR_ICO_2
+00000544  60B4                      98      bra SOURIS_LOOP
+00000546                            99      
+00000546                           100  TASKBAR_ICO_1:
+00000546                           101      * si clic gauche
+00000546  B03C 0001                102      cmp.b #1,D0 
+0000054A  66AE                     103      bne SOURIS_LOOP
+0000054C                           104  TASKBAR_ICO_1_ATTENTE:
+0000054C  4EB9 0000064A            105      jsr get_mouse
+00000552  B03C 0000                106      cmp.b #0,D0
+00000556  66F4                     107      bne TASKBAR_ICO_1_ATTENTE
+00000558  13FC 0005 00000818       108      move.b #$5,TAILLE_CRAYON
+00000560  13FC 0005 00000819       109      move.b #$5,TAILLE_GOMME
+00000568  6090                     110      bra SOURIS_LOOP
+0000056A                           111      
+0000056A                           112  TASKBAR_ICO_2:
+0000056A  B03C 0001                113      cmp.b #1,D0 
+0000056E  668A                     114      bne SOURIS_LOOP
+00000570  4EB9 0000064A            115      jsr get_mouse
+00000576  B03C 0000                116      cmp.b #0,D0
+0000057A  6600 FF7E                117      bne SOURIS_LOOP
+0000057E  13FC 0040 00000818       118      move.b #$40,TAILLE_CRAYON
+00000586  13FC 0040 00000819       119      move.b #$40,TAILLE_GOMME
+0000058E  6000 FF6A                120      bra SOURIS_LOOP
+00000592                           121  
+00000592                           122      * souris dans la zone de dessin * 
+00000592                           123  PIXEL_DESSIN:
+00000592                           124  
+00000592  2239 00000810            125      move.l NOIR,D1
+00000598  4EB9 0000065A            126      jsr set_pen_color
+0000059E  1239 00000818            127      move.b TAILLE_CRAYON,D1
+000005A4  4EB9 000006BA            128      jsr width_pen
+000005AA  2239 00000810            129      move.l NOIR,D1
+000005B0  4EB9 00000662            130      jsr set_fill_color
+000005B6                           131      
+000005B6  3239 00000814            132      move.w X,D1
+000005BC  3439 00000816            133      move.w Y,D2
+000005C2  3639 00000814            134      move.w X,D3
+000005C8  3839 00000816            135      move.w Y,D4
+000005CE  4EB9 0000069A            136      jsr draw_fill_ellipse
+000005D4                           137      
+000005D4  6000 FF24                138      bra SOURIS_LOOP
+000005D8                           139     
+000005D8                           140  PIXEL_EFFACE:
+000005D8  2239 0000080C            141      move.l BLANC,D1
+000005DE  4EB9 0000065A            142      jsr set_pen_color
+000005E4  1239 00000819            143      move.b TAILLE_GOMME,D1
+000005EA  4EB9 000006BA            144      jsr width_pen
+000005F0  2239 0000080C            145      move.l BLANC,D1
+000005F6  4EB9 00000662            146      jsr set_fill_color
+000005FC                           147      
+000005FC  3239 00000814            148      move.w X,D1
+00000602  3439 00000816            149      move.w Y,D2
+00000608  3639 00000814            150      move.w X,D3
+0000060E  3839 00000816            151      move.w Y,D4
+00000614  4EB9 0000069A            152      jsr draw_fill_ellipse
+0000061A                           153      
+0000061A  6000 FEDE                154      bra SOURIS_LOOP
+0000061E                           155  
+0000061E                           156  
+0000061E                           157  
+0000061E                           158  
+0000061E                           159  
+0000061E                           160  FIN:
+0000061E  4EB9 00000634            161      jsr FINPRG
+00000624                           162      include 'BIBLIO.X68'
+00000624                           163  AFFCAR:
+00000624  303C 0006                164      MOVE #6,D0
+00000628  4E4F                     165      TRAP #15
+0000062A  4E75                     166      RTS
+0000062C                           167  SAISCAR:
+0000062C  303C 0005                168      MOVE #5,D0
+00000630  4E4F                     169      TRAP #15
+00000632  4E75                     170      RTS
+00000634                           171  FINPRG:
+00000634  303C 0009                172      MOVE #9,D0
+00000638  4E4F                     173      TRAP #15
+0000063A                           174  
+0000063A                           175  
+0000063A                           176  
+0000063A                           177  -------------------- end include --------------------
+0000063A                           178      include 'BIBPERIPH.X68'
+0000063A                           179  HARDWARE:
+0000063A  303C 0020                180      move #32,D0
+0000063E  4E4F                     181      trap #15
+00000640  4E75                     182      rts
+00000642                           183  RESOLUTION:
+00000642  303C 0021                184      move #33,D0
+00000646  4E4F                     185      trap #15
+00000648  4E75                     186      rts
+0000064A                           187  GET_MOUSE:
+0000064A  303C 003D                188      move #61,D0
+0000064E  4E4F                     189      trap #15
+00000650  4E75                     190      rts
+00000652                           191  MOUSE_IRQ:
+00000652  303C 003C                192      move #60,D0
+00000656  4E4F                     193      trap #15
+00000658  4E75                     194      rts
+0000065A                           195  
+0000065A                           196  -------------------- end include --------------------
+0000065A                           197      include 'BIBGRAPH.X68'
+0000065A                           198  SET_PEN_COLOR:
+0000065A  303C 0050                199      move #80,D0
+0000065E  4E4F                     200      trap #15
+00000660  4E75                     201      rts
+00000662                           202  SET_FILL_COLOR:
+00000662  303C 0051                203      move #81,D0
+00000666  4E4F                     204      trap #15
+00000668  4E75                     205      rts
+0000066A                           206  DRAW_PIX:
+0000066A  303C 0052                207      move #82,D0
+0000066E  4E4F                     208      trap #15
+00000670  4E75                     209      rts
+00000672                           210  GET_PIX_COLOR:
+00000672  303C 0053                211      move #83,D0
+00000676  4E4F                     212      trap #15
+00000678  4E75                     213      rts
+0000067A                           214  DRAW_LINE:
+0000067A  303C 0054                215      move #84,D0
+0000067E  4E4F                     216      trap #15
+00000680  4E75                     217      rts
+00000682                           218  DRAW_TO:
+00000682  303C 0055                219      move #85,D0
+00000686  4E4F                     220      trap #15
+00000688  4E75                     221      rts
+0000068A                           222  MOVE_TO:
+0000068A  303C 0056                223      move #86,D0
+0000068E  4E4F                     224      trap #15
+00000690  4E75                     225      rts
+00000692                           226  DRAW_FILL_RECT:
+00000692  303C 0057                227      move #87,D0
+00000696  4E4F                     228      trap #15
+00000698  4E75                     229      rts
+0000069A                           230  DRAW_FILL_ELLIPSE:
+0000069A  303C 0058                231      move #88,D0
+0000069E  4E4F                     232      trap #15
+000006A0  4E75                     233      rts
+000006A2                           234  POT_DE_PEINTURE:
+000006A2  303C 0059                235      move #89,D0
+000006A6  4E4F                     236      trap #15
+000006A8  4E75                     237      rts
+000006AA                           238  DRAW_RECT:
+000006AA  303C 005A                239      move #90,D0
+000006AE  4E4F                     240      trap #15
+000006B0  4E75                     241      rts
+000006B2                           242  DRAW_ELLIPSE:
+000006B2  303C 005B                243      move #91,D0
+000006B6  4E4F                     244      trap #15
+000006B8  4E75                     245      rts
+000006BA                           246  WIDTH_PEN:
+000006BA  303C 005D                247      move #93,D0
+000006BE  4E4F                     248      trap #15
+000006C0  4E75                     249      rts
+000006C2                           250  DRAW_STRING:
+000006C2  303C 005F                251      move #95,D0
+000006C6  4E4F                     252      trap #15
+000006C8  4E75                     253      rts
+000006CA                           254  SWAP_STRING:
+000006CA  303C 005E                255      move #94,D0
+000006CE  4E4F                     256      trap #15
+000006D0  4E75                     257      rts
+000006D2                           258  DRAW_MODE:
+000006D2  303C 005C                259      move #92,D0
+000006D6  4E4F                     260      trap #15
+000006D8  4E75                     261      rts
+000006DA                           262  
+000006DA                           263  -------------------- end include --------------------
+000006DA                           264      
+00000800                           265      ORG $800
+00000800= 00F1F1F1                 266  GRIS_C: DC.L $00F1F1F1
+00000804= 00D4D4D4                 267  GRIS_F: DC.L $00D4D4D4
+00000808= 000000FF                 268  ROUGE:  DC.L $000000FF
+0000080C= 00FFFFFF                 269  BLANC:  DC.L $00FFFFFF
+00000810= 00000000                 270  NOIR:   DC.L $00000000
+00000814                           271  X:      DS.W 1
+00000816                           272  Y:      DS.W 1
+00000818= 10                       273  TAILLE_CRAYON:  DC.b $10
+00000819= 10                       274  TAILLE_GOMME:   DC.b $10
+0000081A= 0040                     275  TAILLE_TB:      DC.w $0040
+0000081C                           276      END $400
+
+No errors detected
+No warnings generated
+
+
+SYMBOL TABLE INFORMATION
+Symbol-name         Value
+-------------------------
+AFFCAR              624
+BLANC               80C
+DRAW_ELLIPSE        6B2
+DRAW_FILL_ELLIPSE   69A
+DRAW_FILL_RECT      692
+DRAW_LINE           67A
+DRAW_MODE           6D2
+DRAW_PIX            66A
+DRAW_RECT           6AA
+DRAW_STRING         6C2
+DRAW_TO             682
+FIN                 61E
+FINPRG              634
+GET_MOUSE           64A
+GET_PIX_COLOR       672
+GRIS_C              800
+GRIS_F              804
+HARDWARE            63A
+MOUSE_IRQ           652
+MOVE_TO             68A
+NOIR                810
+PIXEL_DESSIN        592
+PIXEL_EFFACE        5D8
+POT_DE_PEINTURE     6A2
+RESOLUTION          642
+ROUGE               808
+SAISCAR             62C
+SET_FILL_COLOR      662
+SET_PEN_COLOR       65A
+SOURIS_LOOP         4FA
+SWAP_STRING         6CA
+TAILLE_CRAYON       818
+TAILLE_GOMME        819
+TAILLE_TB           81A
+TASKBAR             52C
+TASKBAR_ICO_1       546
+TASKBAR_ICO_1_ATTENTE  54C
+TASKBAR_ICO_2       56A
+WIDTH_PEN           6BA
+X                   814
+Y                   816
